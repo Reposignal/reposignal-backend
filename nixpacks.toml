@@ -1,0 +1,15 @@
+[phases.setup]
+nixPkgs = ["bun"]
+
+[phases.install]
+cmds = ["bun install --frozen-lockfile"]
+
+[phases.build]
+cmds = []
+
+[phases.start]
+cmds = [
+  "bun run src/db/migrate.ts",
+  "bun run src/db/seedCanonical.ts",
+  "bun run src/server.ts"
+]
