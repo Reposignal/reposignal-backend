@@ -2,8 +2,15 @@ import { Hono } from 'hono';
 import { setCookie } from 'hono/cookie';
 import { getGitHubLoginUrl, exchangeCodeForToken, fetchGitHubUser, createSession } from '../auth/githubOAuth';
 import { updateProfile } from '../modules/profiles/update';
+import { userAuth, type UserActor } from '../auth/userAuth';
 
-const auth = new Hono();
+type Env = {
+  Variables: {
+    actor: UserActor;
+  };
+};
+
+const auth = new Hono<Env>();
 
 // GET /auth/github/login
 auth.get('/github/login', (c) => {
@@ -46,14 +53,24 @@ auth.get('/github/callback', async (c) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'Lax',
-      maxAge: 30 * 24 * 60 * 60, // 30 days
+      maxAge: 30 * 24 * 60 * 60,
+      domain: process.env.COOKIE_DOMAIN // 30 days
     });
 
-    return c.redirect('/');
+    return c.redirect(process.env.REDIRECT_URL_FRONTEND || '/');
   } catch (error) {
     console.error('OAuth callback error:', error);
     return c.json({ error: 'Authentication failed' }, 500);
   }
+});
+
+// GET /auth/me
+auth.get('/me', userAuth, (c) => {
+  const actor = c.get('actor') as UserActor;
+  return c.json({
+    githubId: actor.githubId,
+    username: actor.username
+  });
 });
 
 // POST /auth/logout

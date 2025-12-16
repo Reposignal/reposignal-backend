@@ -964,6 +964,54 @@ export const openAPISpec = {
       },
     },
 
+    '/auth/me': {
+      get: {
+        tags: ['Authentication'],
+        summary: 'Get current authenticated user',
+        operationId: 'getCurrentUser',
+        description: 'Returns the currently authenticated user information',
+        security: [{ bearerAuth: [] }],
+        responses: {
+          '200': {
+            description: 'Current user information',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    githubId: {
+                      type: 'number',
+                      description: 'GitHub user ID',
+                    },
+                    username: {
+                      type: 'string',
+                      description: 'GitHub username',
+                    },
+                  },
+                  required: ['githubId', 'username'],
+                },
+              },
+            },
+          },
+          '401': {
+            description: 'Unauthorized - authentication required or invalid/expired session',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    error: {
+                      type: 'string',
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+
     '/auth/logout': {
       post: {
         tags: ['Authentication'],
