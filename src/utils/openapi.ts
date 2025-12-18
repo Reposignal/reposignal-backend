@@ -396,6 +396,15 @@ export const openAPISpec = {
             description: 'Filter by languages via canonical matchingName (comma-separated)',
           },
           {
+            name: 'includeUnclassified',
+            in: 'query',
+            schema: {
+              type: 'boolean',
+              default: true,
+            },
+            description: 'Include unclassified issues from repositories that allow them. When false, only returns issues with difficulty ratings.',
+          },
+          {
             name: 'limit',
             in: 'query',
             schema: {
@@ -1516,6 +1525,102 @@ export const openAPISpec = {
           },
           '401': {
             description: 'Unauthorized',
+          },
+        },
+      },
+    },
+
+    '/bot/repositories/{id}/settings': {
+      post: {
+        tags: ['Bot - Repositories'],
+        summary: 'Update repository settings',
+        operationId: 'updateRepositorySettingsBot',
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Repository ID',
+            schema: {
+              type: 'integer',
+            },
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  reposignalDescription: {
+                    type: 'string',
+                    nullable: true,
+                    description: 'Custom repository description for Reposignal',
+                  },
+                  state: {
+                    type: 'string',
+                    enum: ['off', 'public', 'paused'],
+                    description: 'Repository visibility state',
+                  },
+                  allowUnclassified: {
+                    type: 'boolean',
+                    description: 'Allow issues without difficulty/type classification',
+                  },
+                  allowClassification: {
+                    type: 'boolean',
+                    description: 'Allow bot to classify issues',
+                  },
+                  allowInference: {
+                    type: 'boolean',
+                    description: 'Allow bot to infer frameworks',
+                  },
+                  feedbackEnabled: {
+                    type: 'boolean',
+                    description: 'Enable contributor feedback collection',
+                  },
+                  actor: {
+                    type: 'object',
+                    description: 'Optional actor information for audit logging',
+                    properties: {
+                      githubId: {
+                        type: 'number',
+                      },
+                      username: {
+                        type: 'string',
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          '200': {
+            description: 'Settings updated successfully',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    success: {
+                      type: 'boolean',
+                    },
+                  },
+                },
+              },
+            },
+          },
+          '401': {
+            description: 'Unauthorized',
+          },
+          '404': {
+            description: 'Repository not found',
+          },
+          '500': {
+            description: 'Failed to update settings',
           },
         },
       },

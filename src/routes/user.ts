@@ -1,8 +1,14 @@
 import { Hono } from 'hono';
+import { getCookie } from 'hono/cookie';
 import { userAuth, type UserActor } from '../auth/userAuth';
 import { updateProfile } from '../modules/profiles/update';
 import { updateRepositorySettings } from '../modules/repositories/updateSettings';
 import { getLogs } from '../modules/logs/reader';
+import { verifyRepoAccess } from '../auth/repoPermission';
+import { db } from '../db/client';
+import { repositories } from '../db/schema/index';
+import { eq } from 'drizzle-orm';
+import { ForbiddenError, ResourceNotFoundError } from '../utils/errors';
 
 type Env = {
   Variables: {
@@ -41,7 +47,22 @@ user.post('/repositories/:id/settings', async (c) => {
     const repoId = parseInt(c.req.param('id'));
     const body = await c.req.json();
 
-    // TODO: Add permission check to ensure user owns/maintains this repo
+    // Get repository from database
+    const [repo] = await db.select().from(repositories).where(eq(repositories.id, repoId)).limit(1);
+    if (!repo) {
+      throw new ResourceNotFoundError('Repository', repoId.toString());
+    }
+
+    // Verify user has permission to modify this repository
+    const token = getCookie(c, 'session');
+    if (!token) {
+      throw new ForbiddenError('Session token required');
+    }
+
+    const hasAccess = await verifyRepoAccess(repo.owner, repo.name, token);
+    if (!hasAccess) {
+      throw new ForbiddenError('You do not have permission to modify this repository');
+    }
 
     const result = await updateRepositorySettings(repoId, body, {
       githubId: actor.githubId,
@@ -62,7 +83,23 @@ user.get('/repositories/:id/logs', async (c) => {
     const limit = parseInt(c.req.query('limit') || '50');
     const offset = parseInt(c.req.query('offset') || '0');
 
-    // TODO: Add permission check to ensure user owns/maintains this repo
+    // Get repository from database
+    const repoIdNum = parseInt(repoId);
+    const [repo] = await db.select().from(repositories).where(eq(repositories.id, repoIdNum)).limit(1);
+    if (!repo) {
+      throw new ResourceNotFoundError('Repository', repoId);
+    }
+
+    // Verify user has permission to view logs for this repository
+    const token = getCookie(c, 'session');
+    if (!token) {
+      throw new ForbiddenError('Session token required');
+    }
+
+    const hasAccess = await verifyRepoAccess(repo.owner, repo.name, token);
+    if (!hasAccess) {
+      throw new ForbiddenError('You do not have permission to view logs for this repository');
+    }
 
     const logs = await getLogs({ repoId, limit, offset });
 

@@ -21,6 +21,7 @@ export type DiscoveryFilters = {
   frameworkMatchingNames?: string[];
   languageIds?: number[];
   languageMatchingNames?: string[];
+  includeUnclassified?: boolean;
   limit?: number;
   offset?: number;
 };
@@ -58,6 +59,7 @@ export async function discoverRepositories(filters: DiscoveryFilters = {}) {
     frameworkMatchingNames,
     languageIds,
     languageMatchingNames,
+    includeUnclassified = true,
     limit = 20,
     offset = 0,
   } = filters;
@@ -86,7 +88,12 @@ export async function discoverRepositories(filters: DiscoveryFilters = {}) {
 
   query = query.where(eq(repositories.state, "public"));
   query = query.where(eq(issues.hidden, false));
-  query = query.where(sql`${issues.difficulty} IS NOT NULL OR ${repositories.allowUnclassified} = true`);
+  
+  if (includeUnclassified) {
+    query = query.where(sql`${issues.difficulty} IS NOT NULL OR ${repositories.allowUnclassified} = true`);
+  } else {
+    query = query.where(sql`${issues.difficulty} IS NOT NULL`);
+  }
 
   if (difficulty !== undefined) {
     if (Array.isArray(difficulty)) {

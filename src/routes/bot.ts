@@ -4,6 +4,7 @@ import { syncInstallation } from '../modules/installations/sync';
 import { classifyIssue } from '../modules/issues/classify';
 import { updateRepositoryMetadata, addDomains, deleteDomain, addTags, deleteTag } from '../modules/repositories/updateMetadata';
 import { addRepository } from '../modules/repositories/add';
+import { updateRepositorySettings } from '../modules/repositories/updateSettings';
 import { submitFeedback } from '../modules/feedback/submit';
 import { writeLog } from '../modules/logs/writer';
 import { ActorType } from '../utils/enums';
@@ -59,6 +60,24 @@ bot.post('/repositories/add', async (c) => {
   } catch (error: any) {
     console.error('Add repository error:', error);
     return c.json({ error: error.message || 'Failed to add repository' }, 500);
+  }
+});
+
+// POST /bot/repositories/:id/settings
+bot.post('/repositories/:id/settings', async (c) => {
+  try {
+    const repoId = parseInt(c.req.param('id'));
+    const body = await c.req.json();
+
+    const result = await updateRepositorySettings(repoId, body, {
+      githubId: body.actor?.githubId || null,
+      username: body.actor?.username || null,
+    });
+
+    return c.json(result);
+  } catch (error: any) {
+    console.error('Repository settings update error:', error);
+    return c.json({ error: error.message || 'Failed to update settings' }, 500);
   }
 });
 
