@@ -1408,23 +1408,50 @@ export const openAPISpec = {
               schema: {
                 type: 'object',
                 properties: {
-                  githubRepoId: {
+                  repoId: {
                     type: 'number',
+                    description: 'Internal repository ID',
                   },
                   githubIssueId: {
                     type: 'number',
+                    description: 'GitHub issue number',
                   },
                   difficulty: {
                     type: 'integer',
                     minimum: 1,
                     maximum: 5,
+                    nullable: true,
+                    description: 'Issue difficulty rating (1-5)',
                   },
                   issueType: {
                     type: 'string',
                     enum: ['docs', 'bug', 'feature', 'refactor', 'test', 'infra'],
+                    nullable: true,
+                    description: 'Issue type classification',
+                  },
+                  hidden: {
+                    type: 'boolean',
+                    description: 'Whether the issue should be hidden from discovery',
+                  },
+                  actor: {
+                    type: 'object',
+                    description: 'User who performed the classification',
+                    properties: {
+                      type: {
+                        type: 'string',
+                        enum: ['user'],
+                      },
+                      githubId: {
+                        type: 'number',
+                      },
+                      username: {
+                        type: 'string',
+                      },
+                    },
+                    required: ['type', 'githubId', 'username'],
                   },
                 },
-                required: ['githubRepoId', 'githubIssueId', 'difficulty', 'issueType'],
+                required: ['repoId', 'githubIssueId', 'actor'],
               },
             },
           },
@@ -1695,8 +1722,27 @@ export const openAPISpec = {
                   openIssuesCount: {
                     type: 'number',
                   },
+                  actor: {
+                    type: 'object',
+                    description: 'Actor performing the metadata update',
+                    properties: {
+                      type: {
+                        type: 'string',
+                        enum: ['system', 'bot', 'user'],
+                      },
+                      githubId: {
+                        type: 'number',
+                        nullable: true,
+                      },
+                      username: {
+                        type: 'string',
+                        nullable: true,
+                      },
+                    },
+                    required: ['type'],
+                  },
                 },
-                required: ['githubRepoId'],
+                required: ['githubRepoId', 'actor'],
               },
             },
           },
@@ -1742,6 +1788,7 @@ export const openAPISpec = {
                   },
                   actor: {
                     type: 'object',
+                    description: 'Actor performing the action',
                     properties: {
                       type: {
                         type: 'string',
@@ -1749,11 +1796,14 @@ export const openAPISpec = {
                       },
                       githubId: {
                         type: 'number',
+                        nullable: true,
                       },
                       username: {
                         type: 'string',
+                        nullable: true,
                       },
                     },
+                    required: ['type'],
                   },
                 },
                 required: ['githubRepoId', 'owner', 'name', 'domains', 'actor'],
@@ -1814,6 +1864,22 @@ export const openAPISpec = {
                   },
                   actor: {
                     type: 'object',
+                    description: 'Actor performing the action',
+                    properties: {
+                      type: {
+                        type: 'string',
+                        enum: ['user', 'system', 'bot'],
+                      },
+                      githubId: {
+                        type: 'number',
+                        nullable: true,
+                      },
+                      username: {
+                        type: 'string',
+                        nullable: true,
+                      },
+                    },
+                    required: ['type'],
                   },
                 },
                 required: ['githubRepoId', 'owner', 'name', 'domain', 'actor'],
@@ -1865,6 +1931,22 @@ export const openAPISpec = {
                   },
                   actor: {
                     type: 'object',
+                    description: 'Actor performing the action',
+                    properties: {
+                      type: {
+                        type: 'string',
+                        enum: ['user', 'system', 'bot'],
+                      },
+                      githubId: {
+                        type: 'number',
+                        nullable: true,
+                      },
+                      username: {
+                        type: 'string',
+                        nullable: true,
+                      },
+                    },
+                    required: ['type'],
                   },
                 },
                 required: ['githubRepoId', 'owner', 'name', 'tags', 'actor'],
@@ -1913,6 +1995,22 @@ export const openAPISpec = {
                   },
                   actor: {
                     type: 'object',
+                    description: 'Actor performing the action',
+                    properties: {
+                      type: {
+                        type: 'string',
+                        enum: ['user', 'system', 'bot'],
+                      },
+                      githubId: {
+                        type: 'number',
+                        nullable: true,
+                      },
+                      username: {
+                        type: 'string',
+                        nullable: true,
+                      },
+                    },
+                    required: ['type'],
                   },
                 },
                 required: ['githubRepoId', 'owner', 'name', 'tag', 'actor'],
