@@ -17,7 +17,7 @@ export async function getRepositoryDetail(repoId: number) {
   const [repo] = await db
     .select()
     .from(repositories)
-    .where(eq(repositories.id, repoId))
+    .where(eq(repositories.githubRepoId, repoId))
     .limit(1);
 
   if (!repo) {
