@@ -1408,9 +1408,9 @@ export const openAPISpec = {
               schema: {
                 type: 'object',
                 properties: {
-                  repoId: {
+                  githubRepoId: {
                     type: 'number',
-                    description: 'Internal repository ID',
+                    description: 'GitHub repository ID',
                   },
                   githubIssueId: {
                     type: 'number',
@@ -1451,7 +1451,7 @@ export const openAPISpec = {
                     required: ['type', 'githubId', 'username'],
                   },
                 },
-                required: ['repoId', 'githubIssueId', 'actor'],
+                required: ['githubRepoId', 'githubIssueId', 'actor'],
               },
             },
           },

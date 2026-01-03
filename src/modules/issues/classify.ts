@@ -5,7 +5,7 @@ import { eq } from 'drizzle-orm';
 
 export type IssueClassification = {
   githubIssueId: number;
-  repoId: number;
+  githubRepoId: number;
   difficulty?: number | null;
   issueType?: 'docs' | 'bug' | 'feature' | 'refactor' | 'test' | 'infra' | null;
   hidden?: boolean;
@@ -13,7 +13,18 @@ export type IssueClassification = {
 };
 
 export async function classifyIssue(data: IssueClassification) {
-  const { githubIssueId, repoId, difficulty, issueType, hidden, actor } = data;
+  const { githubIssueId, githubRepoId, difficulty, issueType, hidden, actor } = data;
+
+  // Get repository
+  const [repo] = await db
+    .select()
+    .from(repositories)
+    .where(eq(repositories.githubRepoId, githubRepoId))
+    .limit(1);
+
+  if (!repo) {
+    throw new Error(`Repository not found: ${githubRepoId}`);
+  }
 
   // Check if issue exists
   const existing = await db
@@ -29,7 +40,7 @@ export async function classifyIssue(data: IssueClassification) {
     [issue] = await db
       .insert(issues)
       .values({
-        repoId,
+        repoId: repo.id,
         githubIssueId,
         difficulty: difficulty ?? null,
         issueType: issueType ?? null,
@@ -56,17 +67,13 @@ export async function classifyIssue(data: IssueClassification) {
     throw new Error('Failed to create or update issue');
   }
 
-  const [repo] = await db.select().from(repositories).where(eq(repositories.id, repoId)).limit(1);
-
-  if (repo) {
-    await writeLog({
-      actor: { type: 'user', githubId: actor.githubId, username: actor.username },
-      action: difficulty !== undefined ? 'issue_difficulty_set' : 'issue_classified',
-      entityType: 'issue',
-      entityId: `issue:${repo.owner}/${repo.name}#${githubIssueId}`,
-      context: { difficulty, issueType, hidden },
-    });
-  }
+  await writeLog({
+    actor: { type: 'user', githubId: actor.githubId, username: actor.username },
+    action: difficulty !== undefined ? 'issue_difficulty_set' : 'issue_classified',
+    entityType: 'issue',
+    entityId: `issue:${repo.owner}/${repo.name}#${githubIssueId}`,
+    context: { difficulty, issueType, hidden },
+  });
 
   return issue;
 }
