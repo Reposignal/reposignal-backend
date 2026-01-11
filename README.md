@@ -5,7 +5,6 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9.3-blue.svg)](https://www.typescriptlang.org/)
 [![Bun](https://img.shields.io/badge/Bun-Latest-pink.svg)](https://bun.sh/)
 [![Hono](https://img.shields.io/badge/Hono-4.11.0-orange.svg)](https://hono.dev/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
 
 ## 📋 Table of Contents
 
@@ -399,7 +398,7 @@ This project adheres to a [Code of Conduct](./CODE_OF_CONDUCT.md). By participat
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
+This project is licensed under the GNU-AGPL 3.0 License - see the [LICENSE](./LICENSE) file for details.
 
 ## 🔗 Links
 
