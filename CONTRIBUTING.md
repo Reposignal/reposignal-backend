@@ -320,13 +320,6 @@ refactor(api): simplify error handling logic
 - Use the body to explain what and why (not how)
 - Reference issues and PRs in the footer
 
-## Additional Resources
-
-- [Setup Guide](docs/SETUP_GUIDE.md)
-- [API Documentation](docs/API_DOCUMENTATION.md)
-- [Testing Guide](docs/TESTING_GUIDE.md)
-- [Error Handling](docs/ERROR_HANDLING.md)
-
 ## Questions?
 
 If you have questions or need help:
