@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["bun", "postgresql_18_jit"]
+nixPkgs = ["bun", "postgresql"]
 
 [phases.install]
 cmds = ["bun install --frozen-lockfile"]
