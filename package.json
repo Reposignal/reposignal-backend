@@ -11,7 +11,8 @@
     "db:push": "drizzle-kit push",
     "db:seed": "bun run src/db/seedCanonical.ts",
     "db:setup": "bun run db:push && bun run db:seed",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "db:backup": "bun run scripts/backup-db-to-s3.ts"
   },
   "devDependencies": {
     "@types/bun": "latest",
@@ -22,6 +23,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.709.0",
     "@types/pg": "^8.16.0",
     "dotenv": "^17.2.3",
     "drizzle-orm": "^0.45.1",
