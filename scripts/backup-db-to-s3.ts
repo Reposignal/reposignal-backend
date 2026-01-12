@@ -12,7 +12,7 @@ const {
   AWS_S3_BACKUP_BUCKET,
   AWS_ACCESS_KEY_ID,
   AWS_SECRET_ACCESS_KEY,
-  AWS_REGION = 'us-east-1',
+  AWS_REGION = 'ap-south-1',
 } = process.env;
 
 // Validate required environment variables
